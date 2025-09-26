@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Usuario - Level UP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+<div class="container">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-gamepad"></i> Level UP</h3>
+        </div>
+        <ul class="nav-links">
+            <li class="active"><a href="#" data-view="inicio-view"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="#" data-view="juegos-view"><i class="fas fa-dice-d20"></i> Juegos</a></li>
+            <li><a href="#" data-view="mis-juegos-view"><i class="fas fa-download"></i> Mis Juegos</a></li>
+            <li><a href="{{ url_for('donaciones') }}"><i class="fas fa-hand-holding-usd"></i> Donaciones</a></li>
+            <li><a href="{{ url_for('edit_profile') }}"><i class="fas fa-user"></i> Perfil</a></li>
+        </ul>
+        <div class="logout-link">
+            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <header>
+            <div class="search-wrapper">
+                <span class="fa fa-search"></span>
+                <input type="search" placeholder="Buscar juego...">
+            </div>
+        </header>
+        
+        <div id="inicio-view" class="main-view active-view">
+            <h1 class="main-title">Bienvenido, {{ user.username }}</h1>
+            <p>Explora y descubre nuevos juegos de creadores independientes.</p>
+        </div>
+
+        <div id="juegos-view" class="main-view hidden">
+            <h1 class="main-title">Explora los Juegos</h1>
+            <div class="games-list">
+                {% for game in all_games %}
+                <div class="game-item">
+                    <img src="{{ url_for('static', filename='uploads/' + game.image_url) }}" alt="Imagen del juego" class="game-image">
+                    <div class="game-info">
+                        <h3>{{ game.name }}</h3>
+                        <p>{{ game.description }}</p>
+                        <div class="game-actions">
+                            <button class="btn download-btn" data-game-id="{{ game.id }}">
+                                <i class="fas fa-download"></i> Descargar
+                            </button>
+                            <a href="{{ url_for('donaciones', game_id=game.id) }}" class="btn donate-btn">
+                                <i class="fas fa-hand-holding-usd"></i> Donar
+                            </a>
+                        </div>
+                        <div class="comments-section" data-game-id="{{ game.id }}">
+                            <h4>Comentarios</h4>
+                            <div class="comments-list"></div>
+                            <form class="comment-form">
+                                <input type="hidden" name="game_id" value="{{ game.id }}">
+                                <textarea name="content" placeholder="Escribe tu comentario..." required></textarea>
+                                <button type="submit" class="btn btn-comment">Comentar</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div id="mis-juegos-view" class="main-view hidden">
+            <h1 class="main-title">Mis Juegos</h1>
+            <div class="games-list">
+                {% if downloaded_games %}
+                    {% for game in downloaded_games %}
+                    <div class="game-item">
+                        <img src="{{ url_for('static', filename='uploads/' + game.image_url) }}" alt="Imagen del juego" class="game-image">
+                        <div class="game-info">
+                            <h3>{{ game.name }}</h3>
+                            <p>{{ game.description }}</p>
+                            <div class="game-actions">
+                                <span class="badge badge-success">¡Descargado!</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Aún no has descargado ningún juego. ¡Explora la tienda!</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="clientes-view" class="main-view hidden">
+            <h1 class="main-title">Datos Personales</h1>
+        </div>
+
+        <div id="ajustes-view" class="main-view hidden">
+            <h1 class="main-title">Ajustes</h1>
+            <p>Juegos subidos por ti:</p>
+            {% if all_games %}
+                <ul>
+                {% for game in all_games %}
+                    <li>{{ game.name }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No hay juegos para mostrar en esta sección.</p>
+            {% endif %}
+        </div>
+    </main>
+</div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+{% endblock %}

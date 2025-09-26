@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<div class="form-container">
+    <h2>Level Up!</h2>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+        {% for category, message in messages %}
+          <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <input type="text" name="username" placeholder="Usuario" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Iniciar Sesión</button>
+        <div class="form-group">
+            <a href="{{ url_for('request_password_reset') }}" class="btn btn-secondary">¿Olvidaste tu contraseña?</a>
+        </div>
+    </form>
+    <a href="{{ url_for('register') }}">¿No tienes cuenta? Regístrate</a>
+</div>
+
+{% endblock %}

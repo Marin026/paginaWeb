@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+<div class="form-container">
+    <h2>Editar Perfil</h2>
+    <form method="POST" action="{{ url_for('edit_profile') }}">
+        <div class="form-group">
+            <label for="username">Usuario:</label>
+            <input type="text" id="username" name="username" value="{{ user.username }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Correo:</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Nueva Contraseña (opcional):</label>
+            <input type="password" id="password" name="password" placeholder="Deja en blanco para no cambiar">
+        </div>
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        <a href="{{ url_for('home_usuario') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

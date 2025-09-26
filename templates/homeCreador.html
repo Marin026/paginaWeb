@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Creador - Level UP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+<div class="container">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-gamepad"></i> Level UP</h3>
+        </div>
+        <ul class="nav-links">
+            <li class="active"><a href="#" data-view="inicio-view"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="#" data-view="juegos-view"><i class="fas fa-dice-d20"></i> Mis Juegos</a></li>
+            <li><a href="#" data-view="donaciones-view"><i class="fas fa-hand-holding-usd"></i> Donaciones</a></li>
+            <li><a href="#" data-view="subir-view"><i class="fas fa-upload"></i> Subir Juego</a></li>
+             <li><a href="{{ url_for('edit_profile') }}"><i class="fas fa-user"></i> Perfil</a></li>
+        </ul>
+        <div class="logout-link">
+            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </div>
+    </nav>
+    <main class="main-content">
+        <header>
+            <div class="search-wrapper">
+                <span class="fa fa-search"></span>
+                <input type="search" placeholder="Buscar juego, pedido, cliente...">
+            </div>
+            <div class="user-wrapper">
+                <img src="https://i.ibb.co/L8DqT90/user1.png" width="40px" height="40px" alt="user">
+                <div>
+                    <h4>{{ user.username }}</h4>
+                    <small>{{ user.role }}</small>
+                </div>
+            </div>
+        </header>
+
+        <div id="inicio-view" class="main-view active-view">
+            <h1 class="main-title">Panel de Creador</h1>
+            <p>Bienvenido, {{ user.username }}. Aquí puedes gestionar tus juegos y donaciones.</p>
+            <div class="card-grid">
+                <div class="card-item">
+                    <i class="fas fa-upload"></i>
+                    <h4>Juegos Subidos</h4>
+                    <p>{{ creator_games|length }}</p>
+                </div>
+                <div class="card-item">
+                    <i class="fas fa-hand-holding-usd"></i>
+                    <h4>Donaciones Recibidas</h4>
+                    <p>{{ (user.received_donations|map(attribute='amount')|sum)|round(2) }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div id="juegos-view" class="main-view hidden">
+            <h1 class="main-title">Mis Juegos Subidos</h1>
+            <div class="games-list">
+                {% if creator_games %}
+                    {% for game in creator_games %}
+                        <div class="game-item">
+                            <img src="{{ url_for('static', filename='uploads/' + game.image_url) }}" alt="Imagen del juego" class="game-image">
+                            <div class="game-info">
+                                <h3>{{ game.name }}</h3>
+                                <p>{{ game.description }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No has subido ningún juego todavía.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="donaciones-view" class="main-view hidden">
+            <h1 class="main-title">Mis Donaciones Recibidas</h1>
+            <table class="donations-table">
+                <thead>
+                    <tr>
+                        <th>Juego</th>
+                        <th>Monto</th>
+                        <th>Donador</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if received_donations %}
+                        {% for donation in received_donations %}
+                            <tr>
+                                <td>
+                                    {% if donation.game %}
+                                        {{ donation.game.name }}
+                                    {% else %}
+                                        Donación directa
+                                    {% endif %}
+                                </td>
+                                <td>${{ donation.amount }}</td>
+                                <td>{{ donation.donor.username }}</td>
+                                <td>{{ donation.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="4">No has recibido donaciones.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div id="subir-view" class="main-view hidden">
+            <h1 class="main-title">Sube tu Juego</h1>
+            <p>Comparte tu creación con la comunidad.</p>
+            <form method="POST" action="{{ url_for('upload_game') }}" enctype="multipart/form-data" class="upload-form">
+                <div class="form-group">
+                    <label for="game-name">Nombre del Juego:</label>
+                    <input type="text" id="game-name" name="game-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="game-description">Descripción:</label>
+                    <textarea id="game-description" name="game-description" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="game-image">Imagen del Juego:</label>
+                    <input type="file" id="game-image" name="game-image" accept="image/*" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Subir Juego</button>
+            </form>
+        </div>
+    </main>
+</div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
+{% endblock %}

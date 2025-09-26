@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<div class="form-container">
+    <h2>Realizar Donación</h2>
+    <form method="POST" action="{{ url_for('donaciones') }}">
+        <div class="form-group">
+            <label for="creator_id">Donar a Creador:</label>
+            <select id="creator_id" name="creator_id" class="form-control" required>
+                <option value="">Selecciona un creador</option>
+                {% for creator in creators %}
+                    <option value="{{ creator.id }}" {% if preselected_creator_id and preselected_creator_id == creator.id|string %}selected{% endif %}>
+                        {{ creator.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="game_id">Donar por Juego (opcional):</label>
+            <select id="game_id" name="game_id" class="form-control">
+                <option value="">Selecciona un juego (si aplica)</option>
+                {% for game in games %}
+                    <option value="{{ game.id }}" {% if preselected_game_id and preselected_game_id == game.id|string %}selected{% endif %}>
+                        {{ game.name }} (de {{ game.creator.username }})
+                    </option>
+                {% endfor %}
+            </select>
+            <small>Si seleccionas un juego, la donación irá a su creador.</small>
+        </div>
+
+        <div class="form-group">
+            <label for="amount">Monto de la Donación:</label>
+            <input type="number" id="amount" name="amount" step="0.01" min="1" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Donar</button>
+        <a href="{{ url_for('home_usuario') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const creatorSelect = document.getElementById('creator_id');
+        const gameSelect = document.getElementById('game_id');
+
+        // Si se selecciona un juego, deselecciona el creador y viceversa
+        gameSelect.addEventListener('change', function() {
+            if (this.value) {
+                creatorSelect.value = ''; // Deselecciona el creador si se elige un juego
+            }
+        });
+
+        creatorSelect.addEventListener('change', function() {
+            if (this.value) {
+                gameSelect.value = ''; // Deselecciona el juego si se elige un creador
+            }
+        });
+
+        // Asegúrate de que el creador del juego seleccionado se muestre
+        {% if preselected_game_id %}
+            const preselectedGameId = '{{ preselected_game_id }}';
+            gameSelect.value = preselectedGameId;
+        {% elif preselected_creator_id %}
+            const preselectedCreatorId = '{{ preselected_creator_id }}';
+            creatorSelect.value = preselectedCreatorId;
+        {% endif %}
+    });
+</script>
+{% endblock %}

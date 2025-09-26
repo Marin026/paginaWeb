@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Usuario - Tienda de Videojuegos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+</head>
+<body>
+<div class="container">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-gamepad"></i> Level UP</h3>
+        </div>
+        <ul class="nav-links">
+            <li class="active"><a href="#" data-view="inicio-view"><i class="fas fa-home"></i> Inicio</a></li>
+            <li><a href="#" data-view="juegos-view"><i class="fas fa-dice-d20"></i> Juegos</a></li>
+            <li><a href="#" data-view="carrito-view"><i class="fas fa-shopping-cart"></i> Carrito de Compras <span id="cart-count" class="cart-count">0</span></a></li>
+            <li><a href="#" data-view="clientes-view"><i class="fas fa-user-circle"></i> Datos Personales</a></li>         
+            <li><a href="#" data-view="ajustes-view"><i class="fas fa-cogs"></i> Ajustes</a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header>
+            <div class="search-wrapper">
+                <span class="fa fa-search"></span>
+                <input type="search" placeholder="Buscar juego, pedido, cliente...">
+            </div>
+            <div class="search-wrapper">
+                <a href="{{ url_for('logout') }}" class="btn logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </div>
+        </header>
+
+        <main>
+            <div id="inicio-view" class="main-view">
+                <h1 class="main-title">Inicio</h1>
+                <div class="cards">
+                    <div class="recent-activity">
+                        <h2>Juegos Recién Añadidos</h2>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Título del Juego</th>
+                                    <th>Descripción</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if all_games %}
+                                    {% for game in all_games %}
+                                        <tr>
+                                            <td>{{ game.name }}</td>
+                                            <td>{{ game.description }}</td>
+                                            <td><button class="add-to-cart-btn" data-game-id="{{ game.id }}" data-game-name="{{ game.name }}" data-game-image="{{ url_for('static', filename='uploads/' + game.image_url) }}">Añadir al Carrito</button></td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5">No hay juegos disponibles todavía.</td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="juegos-view" class="main-view hidden">
+                <h1 class="main-title">Mis Juegos</h1>
+                <div class="purchase-history">
+                    <div id="purchased-games-list" class="games-list">
+                        <p id="no-games-message">No tienes juegos comprados todavía.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="carrito-view" class="main-view hidden">
+                <h1 class="main-title">Carrito de Compras</h1>
+                <div class="cart-container">
+                    <div class="cart-items">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Juego</th>
+                                    <th>Precio</th>
+                                    <th>Cantidad</th>
+                                    <th>Subtotal</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="cart-table-body"></tbody>
+                        </table>
+                        <p id="empty-cart-message">El carrito está vacío.</p>
+                    </div>
+                    <div class="cart-summary">
+                        <h3>Resumen del Pedido</h3>
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="cart-subtotal">$0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Impuestos (10%):</span>
+                            <span id="cart-tax">$0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="cart-total">$0.00</span>
+                        </div>
+                        <button class="btn btn-checkout" id="checkout-btn">Proceder al Pago</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="clientes-view" class="main-view hidden">
+                <h1 class="main-title">Datos Personales</h1>
+                </div>
+
+            <div id="ajustes-view" class="main-view hidden">
+                <h1 class="main-title">Ajustes</h1>
+                <p>Juegos subidos por ti:</p>
+                {% if all_games %}
+                    <ul>
+                    {% for game in all_games %}
+                        <li>{{ game.name }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No hay juegos para mostrar en esta sección.</p>
+                {% endif %}
+            </div>
+        </main>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+</body>
+</html>
+{% endblock %}
