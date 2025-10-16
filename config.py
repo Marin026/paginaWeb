@@ -15,4 +15,3 @@ class Config:
     MAIL_USERNAME = 'david22guerreroml@gmail.com'
     MAIL_PASSWORD = 'akkgsgpjgsqeqfyb'  # contraseña de aplicación (16 dígitos)
     MAIL_DEFAULT_SENDER = 'david22guerreroml@gmail.com'
-

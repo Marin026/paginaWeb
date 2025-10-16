@@ -8,5 +8,3 @@ services:
       - 5000:5000
     volumes:
       - .:/app
-    environment:
-      - APP_NAME=$APP_NAME

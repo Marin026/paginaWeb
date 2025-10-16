@@ -36,11 +36,13 @@ class Game(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
     image_url = db.Column(db.String(255), nullable=True)
+    file_path = db.Column(db.String(255), nullable=True)  # ✅ Nueva columna
     creator_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    
+
     # Relaciones
     donations = db.relationship('Donation', backref='game', lazy=True, cascade='all, delete-orphan')
     comments = db.relationship('Comment', backref='game', lazy=True, cascade='all, delete-orphan')
+
     
 class Comment(db.Model):
     __tablename__ = 'comment'
