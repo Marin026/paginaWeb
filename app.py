@@ -171,6 +171,44 @@ def upload_game():
 
     return render_template('formu.html')
 
+# --- ELIMINAR JUEGO ---
+@app.route('/delete_game/<int:game_id>', methods=['POST'])
+def delete_game(game_id):
+    if 'user_id' not in session:
+        flash('Debes iniciar sesión para eliminar un juego.', 'error')
+        return redirect(url_for('login'))
+
+    user = User.query.get(session['user_id'])
+    game = Game.query.get_or_404(game_id)
+
+    # Verificar que el usuario sea el creador del juego o un administrador
+    if game.creator_id != user.id and user.role != 'Administrador':
+        flash('No tienes permiso para eliminar este juego.', 'error')
+        return redirect(url_for('home_creador'))
+
+    # Eliminar archivos asociados (imagen y archivo del juego)
+    try:
+        if game.image_url:
+            image_path = os.path.join('static', game.image_url)
+            if os.path.exists(image_path):
+                os.remove(image_path)
+
+        if game.file_path:
+            file_path = os.path.join('static', game.file_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+    except Exception as e:
+        print(f"Error eliminando archivos: {e}")
+
+    # Eliminar registro de la base de datos
+    db.session.delete(game)
+    db.session.commit()
+
+    flash('Juego eliminado correctamente.', 'success')
+    if user.role == 'Administrador':
+        return redirect(url_for('admin_panel'))
+    return redirect(url_for('home_creador'))
+
 
 # --- DONACIONES ---
 @app.route('/donaciones', methods=['GET', 'POST'])

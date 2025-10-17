@@ -269,3 +269,62 @@ a:hover {
     from {opacity: 0; transform: translateY(-20px);}
     to {opacity: 1; transform: translateY(0);}
 }
+
+/* Rejilla de juegos */
+.games-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* varias columnas adaptables */
+    gap: 25px; /* separación entre tarjetas */
+    padding: 20px;
+    justify-items: center; /* centra las tarjetas */
+}
+
+/* Cada juego */
+.game-item {
+    width: 100%;
+    max-width: 300px;   /* 🔹 limita el ancho de cada tarjeta */
+    background: #0a0a0a;
+    color: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.game-item:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);
+}
+
+/* Imagen del juego */
+.game-image {
+    width: 100%;
+    height: 160px;       /* 🔹 controla la altura (ajústalo si quieres más pequeña) */
+    object-fit: cover;   /* recorta sin deformar */
+    border-bottom: 2px solid #0ff;
+}
+
+/* Información del juego */
+.game-info {
+    padding: 10px;
+    text-align: center;
+}
+
+/* Títulos y descripción */
+.game-info h3 {
+    margin: 10px 0 5px;
+    font-size: 1.2em;
+    color: #0ff;
+}
+.game-info p {
+    font-size: 0.9em;
+    color: #ccc;
+}
+
+/* Botones */
+.game-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
