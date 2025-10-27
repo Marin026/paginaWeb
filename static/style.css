@@ -328,3 +328,55 @@ a:hover {
     gap: 10px;
     flex-wrap: wrap;
 }
+/* --- Ajustes visuales suaves para el login --- */
+.main-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh; /* centra verticalmente sin cubrir el footer */
+    background: transparent; /* mantiene tu fondo original */
+}
+
+.form-container {
+    max-width: 400px;
+    width: 100%;
+    padding: 2rem;
+    background-color: rgba(255, 255, 255, 0.05); /* leve transparencia para destacar el bloque */
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+.login-form .form-group {
+    margin-bottom: 1rem;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 0.7rem;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 1rem;
+}
+
+.login-form input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+.text-center {
+    text-align: center;
+    margin-top: 1rem;
+}
+/* Corrige centrado de texto y separación */
+.form-container h2,
+.form-container form,
+.form-container .text-center {
+    text-align: center;
+}
+
+.form-container form input,
+.form-container form button {
+    display: block;
+    margin: 0.5rem auto;
+}

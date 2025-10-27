@@ -2,21 +2,23 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-<div class="form-container">
-    <h2>Registro Gamer</h2>
-    <form method="POST">
-        <input type="text" name="username" placeholder="Usuario" required>
-        <input type="email" name="email" placeholder="Correo" required>
-        <input type="text" name="documento" placeholder="Documento" required>
-        <input type="password" name="password" placeholder="Contraseña" required>
-        <select name="role" required>
+<div class="main-container"> <!-- 🔹 Esto centra el bloque -->
+    <div class="form-container">
+        <h2>Registro Gamer</h2>
+        <form method="POST">
+            <input type="text" name="username" placeholder="Usuario" required>
+            <input type="email" name="email" placeholder="Correo" required>
+            <input type="text" name="documento" placeholder="Documento" required>
+            <input type="password" name="password" placeholder="Contraseña" required>
+            <select name="role" required>
             <option value="Usuario">Usuario</option>
-            <option value="Creador">Creador</option>
+                <option value="Creador">Creador</option>
             
-        </select>
-        <button type="submit">Registrarse</button>
-    </form>
-    <a href="{{ url_for('login') }}">¿Ya tienes cuenta? Inicia sesión</a>
+            </select>
+            <button type="submit">Registrarse</button>
+        </form>
+        <a href="{{ url_for('login') }}">¿Ya tienes cuenta? Inicia sesión</a>
+    </div>
 </div>
 {% endblock %}
 |||||       

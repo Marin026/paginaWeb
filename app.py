@@ -60,8 +60,7 @@ def home():
                 return redirect(url_for('home_creador'))
             elif user.role == 'Administrador':
                 return redirect(url_for('admin_panel'))
-    return render_template('home.html')
-
+    return redirect(url_for('login'))
 
 # --- REGISTRO ---
 @app.route('/register', methods=['GET', 'POST'])
