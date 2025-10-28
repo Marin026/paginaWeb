@@ -7,6 +7,7 @@ from config import Config
 from models import db, User, Game, Comment, Donation, PasswordResetToken 
 from flask_mail import Mail, Message
 import random
+from datetime import datetime
 
 # --- Inicialización de la app Flask ---
 app = Flask(__name__)
@@ -124,6 +125,8 @@ def logout():
 
 
 # --- SUBIR JUEGO ---
+
+
 @app.route('/upload_game', methods=['GET', 'POST'])
 def upload_game():
     if 'user_id' not in session:
@@ -133,11 +136,13 @@ def upload_game():
     if request.method == 'POST':
         game_name = request.form['game-name']
         description = request.form['game-description']
+        genre = request.form.get('game-genre')
+        platform = request.form.get('game-platform')
         image = request.files.get('game-image')
         game_file = request.files.get('game-file')
 
         if not all([game_name, description, image, game_file]):
-            flash("Todos los campos son obligatorios", "error")
+            flash("Todos los campos principales son obligatorios", "error")
             return redirect(url_for('home_creador'))
 
         # Guardar imagen
@@ -154,14 +159,34 @@ def upload_game():
         file_path = os.path.join(file_folder, file_filename)
         game_file.save(file_path)
 
+        # 🔹 Calcular tamaño del archivo
+        file_size_bytes = os.path.getsize(file_path)
+        if file_size_bytes < 1024 * 1024:
+            file_size = f"{file_size_bytes / 1024:.2f} KB"
+        else:
+            file_size = f"{file_size_bytes / (1024 * 1024):.2f} MB"
+
+        # 🔹 Obtener nombre del desarrollador (usuario actual)
+        user = User.query.get(session['user_id'])
+        developer_name = user.username if user else "Desconocido"
+
+        # 🔹 Fecha automática de lanzamiento (día de subida)
+        release_date = datetime.now().strftime("%Y-%m-%d")
+
         # Guardar en la base de datos
         new_game = Game(
             name=game_name,
             description=description,
+            genre=genre,
+            platform=platform,
+            size=file_size,
+            developer=developer_name,
+            release_date=release_date,
             image_url=f'uploads/games/images/{image_filename}',
             file_path=f'uploads/games/files/{file_filename}',
             creator_id=session['user_id']
         )
+
         db.session.add(new_game)
         db.session.commit()
 
@@ -425,6 +450,16 @@ def reset_password_code(token):
 
     return render_template('reset_password.html', token=token)
 
+#-- DETALLE DEL JUEGO ---
+@app.route('/game/<int:game_id>')
+def ver_juego(game_id):
+    # Buscar el juego en la base de datos
+    game = Game.query.get_or_404(game_id)
+
+    # (Opcional) Si tienes relación con comentarios, puedes traerlos así:
+    comentarios = Comment.query.filter_by(game_id=game_id).all()
+
+    return render_template('detalle_juego.html', game=game, comentarios=comentarios)
 
 # --- MAIN ---
 if __name__ == '__main__':

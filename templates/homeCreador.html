@@ -134,8 +134,9 @@
             </table>
         </div>
 
-        
-        
+        <!--Subir juego-->
+       
+        <!--
         <div id="subir-view" class="main-view hidden">
             <h1 class="main-title">Sube tu Juego</h1>
             <p>Comparte tu creación con la comunidad.</p>
@@ -156,7 +157,11 @@
                     <input type="file" id="game-image" name="game-image" accept="image/*" required>
                 </div>
 
+    -->
+
         <!-- 🆕 Campo para subir el archivo del juego -->
+
+        <!--
                 <div class="form-group">
                     <label for="game-file">Archivo del Juego:</label>
                     <input type="file" id="game-file" name="game-file"
@@ -172,8 +177,56 @@
             </form>
         </div>
 
+            -->
         
-        
+        <!--subir juego nuevo-->
+
+        <div id="subir-view" class="main-view hidden">
+            <h1 class="main-title">Sube tu Juego</h1>
+            <p>Comparte tu creación con la comunidad.</p>
+
+            <form method="POST" action="{{ url_for('upload_game') }}" enctype="multipart/form-data" class="upload-form">
+                <div class="form-group">
+                    <label for="game-name">Nombre del Juego:</label>
+                     <input type="text" id="game-name" name="game-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="game-description">Descripción:</label>
+                    <textarea id="game-description" name="game-description" rows="4" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="game-genre">Género:</label>
+                    <input type="text" id="game-genre" name="game-genre" placeholder="Ejemplo: Acción, Aventura, RPG">
+                </div>
+
+                <div class="form-group">
+                    <label for="game-platform">Plataforma:</label>
+                    <input type="text" id="game-platform" name="game-platform" placeholder="Ejemplo: PC, Android, PS5">
+                </div>
+
+                <div class="form-group">
+                    <label for="game-image">Imagen del Juego:</label>
+                    <input type="file" id="game-image" name="game-image" accept="image/*" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="game-file">Archivo del Juego:</label>
+                    <input type="file" id="game-file" name="game-file"
+                           accept=".zip,.rar,.7z,.exe,.apk,.tar,.gz" required>
+                    <small class="form-text">
+                        (Formatos permitidos: .zip, .rar, .7z, .exe, .apk, .tar, .gz — hasta 2 GB)
+                    </small>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-upload"></i> Subir Juego
+                </button>
+            </form>
+        </div>
+
+
         
         
         

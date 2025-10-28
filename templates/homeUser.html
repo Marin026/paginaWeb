@@ -40,6 +40,10 @@
             <h1 class="main-title">Bienvenido, {{ user.username }}</h1>
             <p>Explora y descubre nuevos juegos de creadores independientes.</p>
         </div>
+        
+
+<!-- JUEGOS CON DETALLES -->
+
 
         <div id="juegos-view" class="main-view hidden">
             <h1 class="main-title">Explora los Juegos</h1>
@@ -47,9 +51,11 @@
                 {% for game in all_games %}
                 <div class="game-item">
                     <img src="{{ url_for('static', filename=game.image_url) }}" alt="Imagen del juego" class="game-image">
+            
                     <div class="game-info">
                         <h3>{{ game.name }}</h3>
                         <p>{{ game.description }}</p>
+                
                         <div class="game-actions">
                             <a href="{{ url_for('static', filename=game.file_path) }}" class="btn btn-secondary" download>
                                 <i class="fas fa-download"></i> Descargar Juego
@@ -57,17 +63,32 @@
                             <a href="{{ url_for('donaciones', game_id=game.id) }}" class="btn donate-btn">
                                 <i class="fas fa-hand-holding-usd"></i> Donar
                             </a>
+                            <!-- Botón de detalles -->
+                            <button class="btn btn-info toggle-details" data-game-id="{{ game.id }}">
+                                <i class="fas fa-info-circle"></i> Ver más detalles
+                            </button>
                         </div>
 
-                        
-                        <div class="comments-section" data-game-id="{{ game.id }}">
-                            <h4>Comentarios</h4>
-                            <div class="comments-list"></div>
-                            <form class="comment-form">
-                                <input type="hidden" name="game_id" value="{{ game.id }}">
-                                <textarea name="content" placeholder="Escribe tu comentario..." required></textarea>
-                                <button type="submit" class="btn btn-comment">Comentar</button>
-                            </form>
+                        <!-- Sección oculta de detalles -->
+                        <div class="game-details hidden" id="details-{{ game.id }}">
+                            <h4>Especificaciones del juego</h4>
+                            <ul>
+                                <li><strong>Género:</strong> {{ game.genre }}</li>
+                                <li><strong>Plataforma:</strong> {{ game.platform }}</li>
+                                <li><strong>Tamaño:</strong> {{ game.size }}</li>
+                                <li><strong>Desarrollador:</strong> {{ game.developer }}</li>
+                                <li><strong>Fecha de lanzamiento:</strong> {{ game.release_date }}</li>
+                            </ul>
+
+                            <div class="comments-section" data-game-id="{{ game.id }}">
+                                <h4>Comentarios</h4>
+                                <div class="comments-list"></div>
+                                <form class="comment-form">
+                                    <input type="hidden" name="game_id" value="{{ game.id }}">
+                                    <textarea name="content" placeholder="Escribe tu comentario..." required></textarea>
+                                    <button type="submit" class="btn btn-comment">Comentar</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -75,6 +96,30 @@
             </div>
         </div>
 
+<!-- Script para mostrar/ocultar detalles -->
+        <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const buttons = document.querySelectorAll('.toggle-details');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const gameId = button.getAttribute('data-game-id');
+                    const detailsSection = document.getElementById(`details-${gameId}`);
+                    detailsSection.classList.toggle('hidden');
+
+                    // Cambia el texto del botón
+                    if (detailsSection.classList.contains('hidden')) {
+                        button.innerHTML = '<i class="fas fa-info-circle"></i> Ver más detalles';
+                    } else {
+                        button.innerHTML = '<i class="fas fa-chevron-up"></i> Ocultar detalles';
+                    }
+                });
+            });
+        });
+        </script>
+
+        
+<!-- MIS JUEGOS -->
         <div id="mis-juegos-view" class="main-view hidden">
             <h1 class="main-title">Mis Juegos</h1>
             <div class="games-list">
