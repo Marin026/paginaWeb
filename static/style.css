@@ -128,6 +128,16 @@ header {
 .user-wrapper .logout-btn {
     background: #e74c3c;
     color: #fff;
+    
+}
+.logout-link{
+    padding: 20px 50px 20px 40px;
+    background: #006151;
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #293635;
+    border-radius: 8px;
+    
+    
 }
 
 .user-wrapper .logout-btn:hover {
@@ -282,7 +292,7 @@ a:hover {
 /* Cada juego */
 .game-item {
     width: 100%;
-    max-width: 300px;   /* 🔹 limita el ancho de cada tarjeta */
+    max-width: 400px;   /* 🔹 limita el ancho de cada tarjeta */
     background: #0a0a0a;
     color: #fff;
     border-radius: 12px;
@@ -343,7 +353,7 @@ a:hover {
     padding: 2rem;
     background-color: rgba(255, 255, 255, 0.05); /* leve transparencia para destacar el bloque */
     border-radius: 12px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 30px rgba(0, 255, 234, 0.3), inset 0 0 15px rgba(0, 255, 234, 0.1);
 }
 
 .login-form .form-group {
@@ -357,11 +367,13 @@ a:hover {
     border: 1px solid #ccc;
     outline: none;
     font-size: 1rem;
+    
 }
 
 .login-form input:focus {
     border-color: #007bff;
     box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+    
 }
 
 .text-center {
@@ -379,4 +391,88 @@ a:hover {
 .form-container form button {
     display: block;
     margin: 0.5rem auto;
+}
+
+
+
+/* --- Estilos específicos del formulario de subida --- */
+.upload-form {
+    animation: fadeIn 0.6s ease;
+}
+
+.upload-form .form-group {
+    margin-bottom: 1.2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.upload-form label {
+    color: #00ffea;
+    font-weight: bold;
+    margin-bottom: 5px;
+    text-shadow: 0 0 5px #00ffea;
+}
+
+.upload-form input[type="text"],
+.upload-form textarea,
+.upload-form input[type="file"] {
+    background: #1a1a2e;
+    border: 1px solid rgba(0, 255, 234, 0.3);
+    border-radius: 8px;
+    padding: 10px;
+    color: #00ffea;
+    font-family: 'Orbitron', sans-serif;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.upload-form input:focus,
+.upload-form textarea:focus {
+    border-color: #00ffea;
+    box-shadow: 0 0 10px #00ffea;
+}
+
+.upload-form textarea {
+    resize: vertical;
+}
+
+.upload-form .form-text {
+    color: #aaa;
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+/* Botón coherente con el estilo general */
+.upload-form button {
+    margin-top: 15px;
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1em;
+    text-transform: uppercase;
+    border-radius: 8px;
+    font-family: 'Orbitron', sans-serif;
+}
+
+/* --- Centrar el formulario de subida en la pantalla --- */
+#subir-view {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    min-height: 85vh; /* ocupa casi toda la altura visible */
+}
+
+#subir-view .form-container {
+    width: 100%;
+    max-width: 600px; /* límite para que no se vea gigante */
+    padding: 2rem 2.5rem;
+    background: rgba(15, 15, 26, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 0 25px rgba(0, 255, 234, 0.4);
+    animation: fadeIn 0.6s ease;
+}
+
+/* Centrar textos del encabezado */
+#subir-view h1,
+#subir-view p {
+    text-align: center;
 }

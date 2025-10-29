@@ -1,69 +1,101 @@
-{% extends "base.html" %}
-{% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-<div class="form-container">
-    <h2>Realizar Donación</h2>
-    <form method="POST" action="{{ url_for('donaciones') }}">
-        <div class="form-group">
-            <label for="creator_id">Donar a Creador:</label>
-            <select id="creator_id" name="creator_id" class="form-control" required>
-                <option value="">Selecciona un creador</option>
-                {% for creator in creators %}
-                    <option value="{{ creator.id }}" {% if preselected_creator_id and preselected_creator_id == creator.id|string %}selected{% endif %}>
-                        {{ creator.username }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Donaciones</title>
+    <script src="https://checkout.wompi.co/widget.js"></script>
+</head>
+<body>
+    <h1>Haz una donación</h1>
 
-        <div class="form-group">
-            <label for="game_id">Donar por Juego (opcional):</label>
-            <select id="game_id" name="game_id" class="form-control">
-                <option value="">Selecciona un juego (si aplica)</option>
-                {% for game in games %}
-                    <option value="{{ game.id }}" {% if preselected_game_id and preselected_game_id == game.id|string %}selected{% endif %}>
-                        {{ game.name }} (de {{ game.creator.username }})
-                    </option>
-                {% endfor %}
-            </select>
-            <small>Si seleccionas un juego, la donación irá a su creador.</small>
-        </div>
+    <label>Creador:</label>
+    <select id="creator_id">
+        {% for c in creators %}
+        <option value="{{ c.id }}">{{ c.username }}</option>
+        {% endfor %}
+    </select>
 
-        <div class="form-group">
-            <label for="amount">Monto de la Donación:</label>
-            <input type="number" id="amount" name="amount" step="0.01" min="1" class="form-control" required>
-        </div>
-        <button type="submit" class="btn btn-primary">Donar</button>
-        <a href="{{ url_for('home_usuario') }}" class="btn btn-secondary">Cancelar</a>
-    </form>
-</div>
+    <label>Juego (opcional):</label>
+    <select id="game_id">
+        <option value="">-- Ninguno --</option>
+        {% for g in games %}
+        <option value="{{ g.id }}">{{ g.name }}</option>
+        {% endfor %}
+    </select>
 
+    <label>Monto (COP):</label>
+    <input type="number" id="amount" min="100" step="100" />
+
+    <button id="payButton">Donar con Wompi</button>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const creatorSelect = document.getElementById('creator_id');
-        const gameSelect = document.getElementById('game_id');
+document.getElementById('payButton').addEventListener('click', async function() {
+    const creator_id = document.getElementById('creator_id').value;
+    const game_id = document.getElementById('game_id').value;
+    const amount = document.getElementById('amount').value;
 
-        // Si se selecciona un juego, deselecciona el creador y viceversa
-        gameSelect.addEventListener('change', function() {
-            if (this.value) {
-                creatorSelect.value = ''; // Deselecciona el creador si se elige un juego
-            }
+    if (!amount || amount < 100) {
+        alert("Monto mínimo: 100 COP");
+        return;
+    }
+
+    try {
+        const resp = await fetch("/donaciones", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ creator_id, game_id, amount })
         });
 
-        creatorSelect.addEventListener('change', function() {
-            if (this.value) {
-                gameSelect.value = ''; // Deselecciona el juego si se elige un creador
-            }
+        // Si el servidor devuelve error 500 o similar
+        if (!resp.ok) {
+            const text = await resp.text();
+            console.error("Error en respuesta del servidor:", text);
+            alert("Error al procesar la donación (HTTP " + resp.status + ")");
+            return;
+        }
+
+        // Intentar parsear JSON
+        let data;
+        try {
+            data = await resp.json();
+        } catch (parseError) {
+            console.error("Respuesta no es JSON:", parseError);
+            alert("Error al leer respuesta del servidor");
+            return;
+        }
+
+        if (!data.success) {
+            alert("Error del servidor: " + (data.error || "Error desconocido"));
+            return;
+        }
+
+        const wompi = data.wompi;
+        console.log("✅ Wompi params recibidos:", wompi);
+
+        const checkout = new WidgetCheckout({
+        currency: wompi.currency,
+        amountInCents: wompi.amountInCents,
+        reference: wompi.reference,
+        publicKey: wompi.publicKey,
+        redirectUrl: wompi.redirectUrl,
+        customerData: wompi.customerData,
+
+        // ✅ Agregar firma obligatoria:
+        signature: {
+            integrity: wompi.signature
+        }
         });
 
-        // Asegúrate de que el creador del juego seleccionado se muestre
-        {% if preselected_game_id %}
-            const preselectedGameId = '{{ preselected_game_id }}';
-            gameSelect.value = preselectedGameId;
-        {% elif preselected_creator_id %}
-            const preselectedCreatorId = '{{ preselected_creator_id }}';
-            creatorSelect.value = preselectedCreatorId;
-        {% endif %}
-    });
+        checkout.open((result) => {
+            console.log("Resultado del widget:", result);
+            window.location.href = wompi.redirectUrl;
+        });
+
+    } catch (err) {
+        console.error("❌ Error de conexión:", err);
+        alert("Error de conexión con el servidor");
+    }
+});
 </script>
-{% endblock %}
+
+</body>
+</html>

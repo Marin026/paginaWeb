@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nuevo Avance de Creador en Level UP</title>
+</head>
+<body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <h1 style="color: #4CAF50;">¡Level UP! Nuevo Avance Publicado 📢</h1>
+        
+        <p>Hola,</p>
+        <p>El creador **{{ creator_name }}** ha publicado un nuevo avance/notificación:</p>
+        
+        <div style="border-left: 5px solid #007bff; padding-left: 15px; margin: 20px 0; background-color: #e9f5ff;">
+            <h2 style="color: #007bff; margin-top: 0;">{{ notification_title }}</h2>
+            <p>{{ notification_content }}</p>
+        </div>
+        
+        {% if notification_image_html %}
+            <div style="text-align: center; margin-bottom: 20px;">
+                {{ notification_image_html | safe }} 
+            </div>
+        {% endif %}
+        
+        <p>Puedes ver todos los avances en tu panel de usuario en Level UP.</p>
+        
+        <p style="margin-top: 30px; font-size: 12px; color: #777;">
+            Este es un correo automático, por favor no respondas a este mensaje.
+        </p>
+    </div>
+   
+</body>
+</html>

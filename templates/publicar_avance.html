@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-small">
+    
+    <a href="javascript:history.back()" class="btn btn-secondary" style="margin-bottom: 20px; display: inline-block;">
+        <i class="fas fa-arrow-left"></i> Volver Atrás
+    </a>
+
+    <h1 class="main-title">Publicar Avance o Notificación 📢</h1>
+    <p>Comparte un avance o anuncio con todos los usuarios y creadores de la plataforma. Se enviará por correo y se mostrará en sus paneles.</p>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flashes">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('publicar_avance') }}" enctype="multipart/form-data" class="upload-form">
+        <div class="form-group">
+            <label for="title">Título del Avance:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+            <label for="content">Contenido del Mensaje (Escrito):</label>
+            <textarea id="content" name="content" rows="6" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="image">Imagen de Avance (Opcional):</label>
+            <input type="file" id="image" name="image" accept="image/*">
+        </div>
+        <button type="submit" class="btn btn-primary">Publicar y Enviar Notificación</button>
+    </form>
+</div>
+{% endblock %}

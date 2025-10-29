@@ -15,3 +15,9 @@ class Config:
     MAIL_USERNAME = 'david22guerreroml@gmail.com'
     MAIL_PASSWORD = 'akkgsgpjgsqeqfyb'  # contraseña de aplicación (16 dígitos)
     MAIL_DEFAULT_SENDER = 'david22guerreroml@gmail.com'
+    
+# 🔹 Configuración de Wompi (fuera de la clase Config)
+WOMPI_PUBLIC_KEY = 'pub_prod_rsFWKqoo2nBPc1ywo92AufU32xCP9Vaf'
+WOMPI_INTEGRITY_KEY = 'prod_integrity_Wyki3bEfGsCbWSdXDmTO3TNQkeok31hU'
+WOMPI_REDIRECT_URL = 'https://levelup.isladigital.xyz/donacion_finalizada'
+WOMPI_CURRENCY = 'COP'

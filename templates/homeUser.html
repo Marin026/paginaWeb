@@ -18,7 +18,7 @@
         </div>
         <ul class="nav-links">
             <li class="active"><a href="#" data-view="inicio-view"><i class="fas fa-home"></i> Inicio</a></li>
-            <li><a href="#" data-view="juegos-view"><i class="fas fa-dice-d20"></i> Juegos</a></li>
+            
             <li><a href="#" data-view="mis-juegos-view"><i class="fas fa-download"></i> Mis Juegos</a></li>
             <li><a href="{{ url_for('donaciones') }}"><i class="fas fa-hand-holding-usd"></i> Donaciones</a></li>
             <li><a href="{{ url_for('edit_profile') }}"><i class="fas fa-user"></i> Perfil</a></li>
@@ -45,7 +45,7 @@
 <!-- JUEGOS CON DETALLES -->
 
 
-        <div id="juegos-view" class="main-view hidden">
+        <div id="inicio-view" class="main-view hidden">
             <h1 class="main-title">Explora los Juegos</h1>
             <div class="games-list">
                 {% for game in all_games %}
@@ -120,6 +120,7 @@
 
         
 <!-- MIS JUEGOS -->
+ <!--
         <div id="mis-juegos-view" class="main-view hidden">
             <h1 class="main-title">Mis Juegos</h1>
             <div class="games-list">
@@ -160,7 +161,82 @@
             {% endif %}
         </div>
     </main>
+</div> -->
+
+
+
+<!-- MIS JUEGOS -->
+        <div id="mis-juegos-view" class="main-view hidden">
+            <h1 class="main-title">Mis Juegos</h1>
+            <div class="games-list">
+                {% if downloaded_games %}
+                    {% for game in downloaded_games %}
+                    <div class="game-item">
+                        <img src="{{ url_for('static', filename='uploads/' + game.image_url) }}" alt="Imagen del juego" class="game-image">
+                        <div class="game-info">
+                            <h3>{{ game.name }}</h3>
+                            <p>{{ game.description }}</p>
+                            <div class="game-actions">
+                                <span class="badge badge-success">¡Descargado!</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Aún no has descargado ningún juego. ¡Explora la tienda!</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <div id="clientes-view" class="main-view hidden">
+            <h1 class="main-title">Datos Personales</h1>
+        </div>
+
+        <div id="ajustes-view" class="main-view hidden">
+            <h1 class="main-title">Ajustes</h1>
+            <p>Juegos subidos por ti:</p>
+            {% if all_games %}
+                <ul>
+                {% for game in all_games %}
+                    <li>{{ game.name }}</li>
+                {% endfor %}
+                </ul>
+            {% else %}
+                <p>No hay juegos para mostrar en esta sección.</p>
+            {% endif %}
+        </div>
+       <div id="notificaciones-view" class="main-view hidden">
+    <h1 class="main-title">Últimas Notificaciones y Avances</h1>
+    {% if notifications %}
+        {% for notif in notifications %}
+            <div class="notification-item" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px;">
+                <h2>{{ notif.title }}</h2>
+                <p>Publicado por: <strong>{{ notif.creator.username }}</strong> el {{ notif.created_at.strftime('%d-%m-%Y a las %H:%M') }}</p>
+                <p>{{ notif.content }}</p>
+
+                {% if notif.image_url %}
+                    <img src="{{ url_for('static', filename='uploads/' + notif.image_url) }}" alt="{{ notif.title }}"
+                        style="max-width: 100%; height: auto; border-radius: 4px; margin-top: 10px;">
+                {% endif %}
+
+                <!-- Botón de eliminar -->
+                <form action="{{ url_for('delete_notification', notif_id=notif.id) }}" method="POST" style="margin-top: 10px;">
+                    <button type="submit" style="background-color: #e74c3c; color: white; 
+                        border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+                        🗑️ Eliminar
+                    </button>
+                </form>
+            </div>
+               {% endfor %}
+            {% else %}
+                <p>No hay notificaciones o avances recientes para mostrar.</p>
+            {% endif %}
+        </div>
+    </main>
 </div>
+
+
+
 <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

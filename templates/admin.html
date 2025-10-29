@@ -1,5 +1,189 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h2>Zona de Administrador</h2>
-<p>Solo accesible para Administradores</p>
+ <div class="logout-link">
+            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+        </div>
+
+<div class="container mt-5">
+    <h1 class="main-title mb-4">Panel de Administración - Resumen de Datos</h1>
+    
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="card-title">Donaciones Totales por Mes</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="donationsMonthChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="card-title">Conteo de Usuarios Registrados por Rol</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="loginsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="card-title">Donaciones Totales por Semana</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="donationsWeekChart"></canvas> 
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5 class="card-title">Top 10 Juegos más Descargados</h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="downloadsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función de ayuda para crear gráficas y evitar repetición
+        function createChart(ctx, type, labels, data, labelText, backgroundColors, borderColors, options = {}) {
+            new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: labelText,
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: options.borderWidth || 1,
+                        tension: type === 'line' ? 0.4 : undefined,
+                        fill: type === 'line' ? 'start' : undefined,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, 
+                    plugins: {
+                        legend: { labels: { color: '#fff' } },
+                        title: { display: options.showTitle || false, text: labelText, color: '#fff' }
+                    },
+                    scales: options.scales || {
+                        // Configuración predeterminada (para barras verticales/líneas)
+                        y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#fff' } },
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#fff' } }
+                    },
+                    ...options.extra
+                }
+            });
+        }
+        
+        // Llamada a la API que creamos en Flask para obtener los datos
+        fetch('/admin/dashboard/data')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error de red o no autorizado');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // --- Gráfica 1: Donaciones Mensuales (Barra Vertical) ---
+                const ctxDonationsMonth = document.getElementById('donationsMonthChart').getContext('2d');
+                createChart(ctxDonationsMonth, 'bar', 
+                            data.donations_month.labels, 
+                            data.donations_month.data, 
+                            'Monto Total Donado ($) por Mes', 
+                            'rgba(0, 198, 255, 0.6)', 
+                            'rgba(0, 198, 255, 1)');
+
+
+                // --- Gráfica 2: Conteo de Usuarios por Rol (Dona) ---
+                const ctxLogins = document.getElementById('loginsChart').getContext('2d');
+                createChart(ctxLogins, 'doughnut', 
+                            data.logins.labels, 
+                            data.logins.data, 
+                            'Conteo de Usuarios por Rol', 
+                            [
+                                'rgba(255, 99, 132, 0.8)', // Usuario: Rojo
+                                'rgba(54, 162, 235, 0.8)', // Creador: Azul
+                                'rgba(255, 206, 86, 0.8)'  // Administrador: Amarillo
+                            ],
+                            '#1a1a2e',
+                            { 
+                                borderWidth: 3,
+                                scales: {}, // Eliminar escalas para Dona
+                                extra: { legend: { position: 'top' } } 
+                            });
+
+                // --- Gráfica 3: Donaciones Semanales (Línea) ---
+                const ctxDonationsWeek = document.getElementById('donationsWeekChart').getContext('2d');
+                createChart(ctxDonationsWeek, 'line', 
+                            data.donations_week.labels, 
+                            data.donations_week.data, 
+                            'Monto Total Donado ($) por Semana (Año-Semana)', 
+                            'rgba(75, 192, 192, 0.4)', 
+                            'rgba(75, 192, 192, 1)',
+                            { 
+                                borderWidth: 2
+                            });
+
+                // --- Gráfica 4: Cantidad de Descargas por Juego (¡HORIZONTAL!) ---
+                const ctxDownloads = document.getElementById('downloadsChart').getContext('2d');
+                createChart(ctxDownloads, 'bar', 
+                            data.downloads.labels, 
+                            data.downloads.data, 
+                            'Número de Descargas', 
+                            'rgba(153, 102, 255, 0.6)', 
+                            'rgba(153, 102, 255, 1)',
+                            { 
+                                extra: { indexAxis: 'y' }, // ESTO HACE QUE LA BARRA VAYA DE IZQUIERDA A DERECHA
+                                scales: {
+                                    y: { // Para las barras horizontales, el eje Y es categórico (nombres de los juegos)
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                        ticks: { color: '#fff' }
+                                    },
+                                    x: { // El eje X es el valor numérico (conteo de descargas)
+                                        beginAtZero: true,
+                                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                        ticks: { color: '#fff' }
+                                    }
+                                }
+                            });
+
+
+            })
+            .catch(error => {
+                console.error('Error al obtener datos del dashboard:', error);
+                // Opcional: Mostrar un mensaje de error en el dashboard
+                const container = document.querySelector('.container.mt-5');
+                const errorMessage = document.createElement('p');
+                errorMessage.textContent = 'No se pudieron cargar las gráficas. Verifica si la base de datos tiene datos o si la API /admin/dashboard/data funciona correctamente.';
+                errorMessage.style.color = 'red';
+                container.appendChild(errorMessage);
+            });
+    });
+</script>
 {% endblock %}

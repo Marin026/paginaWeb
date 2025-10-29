@@ -21,7 +21,7 @@
             <li><a href="#" data-view="juegos-view"><i class="fas fa-dice-d20"></i> Mis Juegos</a></li>
             <li><a href="#" data-view="donaciones-view"><i class="fas fa-hand-holding-usd"></i> Donaciones</a></li>
             <li><a href="#" data-view="subir-view"><i class="fas fa-upload"></i> Subir Juego</a></li>
-             <li><a href="{{ url_for('edit_profile') }}"><i class="fas fa-user"></i> Perfil</a></li>
+            <li><a href="{{ url_for('edit_profile') }}"><i class="fas fa-user"></i> Perfil</a></li>
         </ul>
         <div class="logout-link">
             <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
@@ -43,7 +43,7 @@
         </header>
 
         <div id="inicio-view" class="main-view active-view">
-            <h1 class="main-title">Panel de Creador</h1>
+            <h1 class="main-title">Explora las creaciones de la comunidad</h1>
             <p>Bienvenido, {{ user.username }}. Aquí puedes gestionar tus juegos y donaciones.</p>
             <div class="card-grid">
                 <div class="card-item">
@@ -58,6 +58,12 @@
                 </div>
             </div>
         </div>
+
+
+
+
+
+        
         
         <div id="juegos-view" class="main-view hidden">
             <h1 class="main-title">Mis Juegos Subidos</h1>
@@ -133,67 +139,22 @@
                 </tbody>
             </table>
         </div>
-
-        <!--Subir juego-->
-       
-        <!--
-        <div id="subir-view" class="main-view hidden">
-            <h1 class="main-title">Sube tu Juego</h1>
-            <p>Comparte tu creación con la comunidad.</p>
-
-            <form method="POST" action="{{ url_for('upload_game') }}" enctype="multipart/form-data" class="upload-form">
-                <div class="form-group">
-                    <label for="game-name">Nombre del Juego:</label>
-                    <input type="text" id="game-name" name="game-name" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="game-description">Descripción:</label>
-                    <textarea id="game-description" name="game-description" rows="4" required></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="game-image">Imagen del Juego:</label>
-                    <input type="file" id="game-image" name="game-image" accept="image/*" required>
-                </div>
-
-    -->
-
-        <!-- 🆕 Campo para subir el archivo del juego -->
-
-        <!--
-                <div class="form-group">
-                    <label for="game-file">Archivo del Juego:</label>
-                    <input type="file" id="game-file" name="game-file"
-                           accept=".zip,.rar,.7z,.exe,.apk,.tar,.gz" required>
-                    <small class="form-text">
-                        (Formatos permitidos: .zip, .rar, .7z, .exe, .apk, .tar, .gz — hasta 2 GB)
-                    </small>
-                </div>
-
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-upload"></i> Subir Juego
-                </button>
-            </form>
-        </div>
-
-            -->
         
         <!--subir juego nuevo-->
-
         <div id="subir-view" class="main-view hidden">
             <h1 class="main-title">Sube tu Juego</h1>
             <p>Comparte tu creación con la comunidad.</p>
 
-            <form method="POST" action="{{ url_for('upload_game') }}" enctype="multipart/form-data" class="upload-form">
+            <div class="form-container">
+                <form method="POST" action="{{ url_for('upload_game') }}" enctype="multipart/form-data" class="upload-form">
                 <div class="form-group">
                     <label for="game-name">Nombre del Juego:</label>
-                     <input type="text" id="game-name" name="game-name" required>
+                    <input type="text" id="game-name" name="game-name" placeholder="Ejemplo: LevelUp Adventures" required>
                 </div>
 
                 <div class="form-group">
                     <label for="game-description">Descripción:</label>
-                    <textarea id="game-description" name="game-description" rows="4" required></textarea>
+                    <textarea id="game-description" name="game-description" rows="4" placeholder="Cuenta brevemente de qué trata tu juego..." required></textarea>
                 </div>
 
                 <div class="form-group">
@@ -214,31 +175,48 @@
                 <div class="form-group">
                     <label for="game-file">Archivo del Juego:</label>
                     <input type="file" id="game-file" name="game-file"
-                           accept=".zip,.rar,.7z,.exe,.apk,.tar,.gz" required>
+                        accept=".zip,.rar,.7z,.exe,.apk,.tar,.gz" required>
                     <small class="form-text">
-                        (Formatos permitidos: .zip, .rar, .7z, .exe, .apk, .tar, .gz — hasta 2 GB)
+                    (Formatos permitidos: .zip, .rar, .7z, .exe, .apk, .tar, .gz — hasta 2 GB)
                     </small>
                 </div>
 
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn-add-cart">
                     <i class="fas fa-upload"></i> Subir Juego
                 </button>
-            </form>
+                </form>
+            </div>    
         </div>
 
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
+        <div id="notificaciones-view" class="main-view hidden">
+            <div class="main-view-content">
+                <h1 class="main-title">Últimas Notificaciones y Avances</h1>
+                {% if notifications %}
+                    {% for notif in notifications %}
+                        <div class="notification-item" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px;">
+                            <h2>{{ notif.title }}</h2>
+                            <p>Publicado por: <strong>{{ notif.creator.username }}</strong> el {{ notif.created_at.strftime('%d-%m-%Y a las %H:%M') }}</p>
+                            <p>{{ notif.content }}</p>
+                            {% if notif.image_url %}
+                                <img src="{{ url_for('static', filename='uploads/' + notif.image_url) }}" alt="{{ notif.title }}" style="max-width: 100%; height: auto; border-radius: 4px; margin-top: 10px;">
+                            {% endif %}
+                             <!-- Botón de eliminar -->
+                <form action="{{ url_for('delete_notification', notif_id=notif.id) }}" method="POST" style="margin-top: 10px;">
+                    <button type="submit" style="background-color: #e74c3c; color: white; 
+                        border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer;">
+                        🗑️ Eliminar
+                    </button>
+                </form>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No hay notificaciones o avances recientes para mostrar.</p>
+                {% endif %}
+            </div>
+        </div>
         
         
     </main>

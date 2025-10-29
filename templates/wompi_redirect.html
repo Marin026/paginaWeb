@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Estado de la Donación</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fb;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 420px;
+        }
+
+        h1 {
+            margin-bottom: 15px;
+        }
+
+        .success {
+            color: #2ecc71;
+        }
+        .pending {
+            color: #f1c40f;
+        }
+        .error {
+            color: #e74c3c;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 10px 20px;
+            border-radius: 6px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        {% if status == 'APPROVED' %}
+            <h1 class="success">🎉 ¡Donación Exitosa!</h1>
+            <p>Gracias por tu apoyo. Tu donación fue procesada correctamente.</p>
+            <p><strong>ID de Transacción:</strong> {{ transaction_id }}</p>
+        {% elif status == 'PENDING' %}
+            <h1 class="pending">⌛ Donación Pendiente</h1>
+            <p>Tu pago está siendo procesado. Recibirás una notificación una vez sea aprobado.</p>
+            <p><strong>ID de Transacción:</strong> {{ transaction_id }}</p>
+        {% else %}
+            <h1 class="error">❌ Donación Fallida</h1>
+            <p>Lo sentimos, la donación no pudo completarse o fue cancelada.</p>
+        {% endif %}
+
+        <a href="{{ url_for('home_usuario') }}" class="btn">Volver al inicio</a>
+    </div>
+</body>
+</html>

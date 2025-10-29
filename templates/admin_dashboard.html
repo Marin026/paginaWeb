@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="logout-link">
+    <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+</div>
+<div class="row">
+    <!-- DONACIONES POR MES -->
+    <div class="col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="card-title">Donaciones Totales por Mes</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="donationsMonthChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- USUARIOS POR ROL -->
+    <div class="col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="card-title">Conteo de Usuarios Registrados por Rol</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="loginsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DONACIONES POR SEMANA -->
+    <div class="col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="card-title">Donaciones Totales por Semana</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="donationsWeekChart"></canvas> 
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP 10 DESCARGAS -->
+    <div class="col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="card-title">Top 10 Juegos más Descargados</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="downloadsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔥 NUEVA GRÁFICA: ACTIVIDAD DIARIA DEL MES -->
+    <div class="col-md-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header">
+                <h5 class="card-title">Actividad Diaria del Mes (Inicios, Descargas y Donaciones)</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height: 400px;">
+                    <canvas id="activityDayChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // 🎨 Función para crear gráficas fácilmente
+    function createChart(ctx, type, labels, data, labelText, backgroundColors, borderColors, options = {}) {
+        new Chart(ctx, {
+            type: type,
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: labelText,
+                    data: data,
+                    backgroundColor: backgroundColors,
+                    borderColor: borderColors,
+                    borderWidth: options.borderWidth || 1,
+                    tension: type === 'line' ? 0.4 : undefined,
+                    fill: type === 'line' ? 'start' : undefined,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { labels: { color: '#fff' } },
+                    title: { display: options.showTitle || false, text: labelText, color: '#fff' }
+                },
+                scales: options.scales || {
+                    y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#fff' } },
+                    x: { grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#fff' } }
+                },
+                ...options.extra
+            }
+        });
+    }
+
+    // 📡 Obtener datos desde Flask
+    fetch('/admin/dashboard/data')
+        .then(response => {
+            if (!response.ok) throw new Error('Error al cargar datos');
+            return response.json();
+        })
+        .then(data => {
+
+            // --- 1️⃣ Donaciones Mensuales ---
+            const ctxDonationsMonth = document.getElementById('donationsMonthChart').getContext('2d');
+            createChart(ctxDonationsMonth, 'bar',
+                data.donations_month.labels,
+                data.donations_month.data,
+                'Monto Total Donado ($) por Mes',
+                'rgba(0, 198, 255, 0.6)',
+                'rgba(0, 198, 255, 1)'
+            );
+
+            // --- 2️⃣ Usuarios por Rol ---
+            const ctxLogins = document.getElementById('loginsChart').getContext('2d');
+            createChart(ctxLogins, 'doughnut',
+                data.logins.labels,
+                data.logins.data,
+                'Usuarios por Rol',
+                [
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 206, 86, 0.8)'
+                ],
+                '#1a1a2e',
+                {
+                    borderWidth: 3,
+                    scales: {},
+                    extra: { plugins: { legend: { position: 'top' } } }
+                }
+            );
+
+            // --- 3️⃣ Donaciones Semanales ---
+            const ctxDonationsWeek = document.getElementById('donationsWeekChart').getContext('2d');
+            createChart(ctxDonationsWeek, 'line',
+                data.donations_week.labels,
+                data.donations_week.data,
+                'Monto Total Donado ($) por Semana (Año-Semana)',
+                'rgba(75, 192, 192, 0.4)',
+                'rgba(75, 192, 192, 1)',
+                { borderWidth: 2 }
+            );
+
+            // --- 4️⃣ Top 10 Descargas ---
+            const ctxDownloads = document.getElementById('downloadsChart').getContext('2d');
+            createChart(ctxDownloads, 'bar',
+                data.downloads.labels,
+                data.downloads.data,
+                'Número de Descargas',
+                'rgba(153, 102, 255, 0.6)',
+                'rgba(153, 102, 255, 1)',
+                {
+                    extra: { indexAxis: 'y' },
+                    scales: {
+                        y: { ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } },
+                        x: { beginAtZero: true, ticks: { color: '#fff' }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    }
+                }
+            );
+
+            // --- 5️⃣ NUEVA: Actividad Diaria ---
+            const ctxActivity = document.getElementById('activityDayChart').getContext('2d');
+            new Chart(ctxActivity, {
+                type: 'bar',
+                data: {
+                    labels: data.activity_day.labels,
+                    datasets: [
+                        {
+                            label: 'Donaciones ($)',
+                            data: data.activity_day.donations,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Descargas',
+                            data: data.activity_day.downloads,
+                            backgroundColor: 'rgba(255, 206, 86, 0.6)',
+                            borderColor: 'rgba(255, 206, 86, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Inicios de Sesión',
+                            data: data.activity_day.logins,
+                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { color: '#fff' } } },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#fff' } },
+                        x: { ticks: { color: '#fff', autoSkip: true, maxTicksLimit: 10 }, grid: { color: 'rgba(255,255,255,0.1)' } }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error al obtener datos del dashboard:', error);
+            const container = document.querySelector('.container.mt-5');
+            const errorMessage = document.createElement('p');
+            errorMessage.textContent = '⚠️ No se pudieron cargar las gráficas. Verifica si la base de datos tiene datos o si la API /admin/dashboard/data funciona correctamente.';
+            errorMessage.style.color = 'red';
+            container.appendChild(errorMessage);
+        });
+});
+</script>
+{% endblock %}
